@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"archives.tater.doublejumpboost.DoubleJumpBoost"
+		],
+		"client": [
+			"archives.tater.doublejumpboost.DoubleJumpBoostClient"
 		]
 	},
 	"mixins": [

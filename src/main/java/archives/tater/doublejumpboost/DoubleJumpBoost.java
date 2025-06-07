@@ -2,12 +2,11 @@ package archives.tater.doublejumpboost;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.entity.attribute.ClampedEntityAttribute;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.lang.Math.max;
-import static java.util.Objects.requireNonNullElse;
 
 @SuppressWarnings("UnstableApiUsage")
 public class DoubleJumpBoost implements ModInitializer {
@@ -39,26 +37,25 @@ public class DoubleJumpBoost implements ModInitializer {
 					.setTracked(true)
 	);
 
-	public static final AttachmentType<Integer> REMAINING_JUMPS = AttachmentRegistry.create(
-			id("remaining_jumps"),
-			builder -> builder
-                    .syncWith(PacketCodecs.INTEGER, AttachmentSyncPredicate.targetOnly())
-					.initializer(() -> 0)
+	public static final AttachmentType<Integer> USED_JUMPS = AttachmentRegistry.create(
+			id("remaining_jumps")
 	);
 
 	public static boolean canJump(PlayerEntity player) {
-        return requireNonNullElse(player.getAttached(REMAINING_JUMPS), 0) > 0;
+        return !player.getWorld().isClient || player.getAttachedOrSet(USED_JUMPS, 0) < (int) player.getAttributeValue(EXTRA_JUMPS);
 	}
 
 	public static void onJump(PlayerEntity player) {
-        player.setAttached(REMAINING_JUMPS, max(0, requireNonNullElse(player.getAttached(REMAINING_JUMPS), 0) - 1));
+        player.setAttached(USED_JUMPS, player.getAttachedOrElse(USED_JUMPS, 0) + 1);
 	}
 
 	public static void resetJump(PlayerEntity player) {
-		var maxJumps = (int) player.getAttributeValue(EXTRA_JUMPS);
+		if (player.getAttachedOrSet(USED_JUMPS, 0) > 0)
+			player.setAttached(USED_JUMPS, 0);
+	}
 
-		if (requireNonNullElse(player.getAttached(REMAINING_JUMPS), 0) < maxJumps)
-			player.setAttached(REMAINING_JUMPS, maxJumps);
+	public static void recoverJump(PlayerEntity player) {
+		player.setAttached(USED_JUMPS, max(0, player.getAttachedOrElse(USED_JUMPS, 0) - 1));
 	}
 
 	@Override
@@ -66,5 +63,6 @@ public class DoubleJumpBoost implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+		PayloadTypeRegistry.playS2C().register(RecoverJumpPayload.ID, RecoverJumpPayload.CODEC);
 	}
 }
