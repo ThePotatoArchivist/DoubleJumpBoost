@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
+@Debug(export = true)
 public abstract class LivingEntityMixin extends Entity {
     @Shadow public abstract void playSound(@Nullable SoundEvent sound);
 
@@ -37,7 +39,7 @@ public abstract class LivingEntityMixin extends Entity {
     @SuppressWarnings("ConstantValue")
     @ModifyExpressionValue(
             method = "tickMovement",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isOnGround()Z", ordinal = 2)
+            at = @At(value = "INVOKE:LAST", target = "Lnet/minecraft/entity/LivingEntity;isOnGround()Z")
     )
     private boolean allowJump(boolean original, @Share("doubleJumped") LocalBooleanRef doubleJumped) {
         if (original || !((Object) this instanceof PlayerEntity player)) return true;
