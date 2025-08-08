@@ -6,7 +6,6 @@
 		"LivingEntityMixin",
 		"MaceItemMixin",
 		"PlayerEntityMixin",
-		"ServerPlayNetworkHandlerMixin",
 		"StatusEffectsMixin"
 	],
 	"injectors": {
