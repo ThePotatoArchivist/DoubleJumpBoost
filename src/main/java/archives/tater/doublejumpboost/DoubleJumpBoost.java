@@ -42,7 +42,7 @@ public class DoubleJumpBoost implements ModInitializer {
 	);
 
 	public static boolean canJump(PlayerEntity player) {
-        return !player.getWorld().isClient || player.getAttachedOrSet(USED_JUMPS, 0) < (int) player.getAttributeValue(EXTRA_JUMPS);
+        return !player.getEntityWorld().isClient() || player.getAttachedOrSet(USED_JUMPS, 0) < (int) player.getAttributeValue(EXTRA_JUMPS);
 	}
 
 	public static void onJump(PlayerEntity player) {
