@@ -1,7 +1,7 @@
 {
 	"required": true,
 	"package": "archives.tater.doublejumpboost.mixin.client",
-	"compatibilityLevel": "JAVA_21",
+	"compatibilityLevel": "JAVA_25",
 	"client": [
       "ClientPlayerEntityMixin"
 	],

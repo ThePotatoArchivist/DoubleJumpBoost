@@ -17,7 +17,7 @@ import net.minecraft.world.item.MaceItem;
 public class MaceItemMixin {
     @Inject(
             method = "hurtEnemy",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setIgnoreFallDamageFromCurrentImpulse(Z)V")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setIgnoreFallDamageFromCurrentImpulse(ZLnet/minecraft/world/phys/Vec3;)V")
     )
     private void recoverJump(ItemStack stack, LivingEntity target, LivingEntity attacker, CallbackInfo ci) {
         if (attacker instanceof ServerPlayer serverPlayerEntity)
